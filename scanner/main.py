@@ -116,8 +116,8 @@ file_length = len(open(args.filename,'r').read())
 
 
 
-
 temp_token = ""
+output_result = []
 
 while file_length >= 0:
     temp_char = filename.read(1)
@@ -125,14 +125,14 @@ while file_length >= 0:
     #just see if the entered character is delmiter or not
     if (is_operator(temp_char) or is_special_char(temp_char) or is_whitespace(temp_char)):
         if temp_token!='':
-            print(token_Type(temp_token))
-        print(token_Type(temp_char))
+            output_result.append(str(token_Type(temp_token)))
+        output_result.append(str(token_Type(temp_char)))
         temp_token=""
         continue
 
     elif (is_relational_operator(temp_char)):
         if temp_token!='':
-            print(token_Type(temp_token))
+            output_result.append(str(token_Type(temp_token)))
         temp_token=temp_char
         temp_char=filename.read(1)
         file_length-=1
@@ -140,15 +140,19 @@ while file_length >= 0:
         
         if(is_relational_operator(temp_token)):
             if temp_token!='':
-                print(token_Type(temp_token))
+                output_result.append(str(token_Type(temp_token)))
             temp_token=""
             continue
         else:
             if temp_token!='':
-                print(token_Type(temp_token[0]))
+                output_result.append(str(token_Type(temp_token[0])))
             temp_token=temp_token[1]
             continue
 
     temp_token+=temp_char
+
+with open("output.txt" , "w") as output_file :
+    for line in output_result : 
+        output_file.write(line + "\n")
 
 
