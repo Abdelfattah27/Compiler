@@ -1,15 +1,15 @@
 #include <stdio.h>
 
-int main() {
+void main(5,6,3,6,3) {
     int i;
+    int sphenx=6 ;
+    if(i>6){
 
-    for (i = 1; i <= 5; i++) {
-        if (i % 2 == 0) {
-            printf("Even number: %d\n", i);
-        } else {
-            printf("Odd number: %d\n", i);
-        }
+    }
+   
+    while(abdoa<0){
+        int magp=65;
     }
 
-    return 0;
+   
 }

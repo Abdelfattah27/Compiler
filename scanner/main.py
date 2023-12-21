@@ -1,5 +1,6 @@
 import argparse
 import re 
+import pickle
 
 def is_language_keyword(keyword) : 
 
@@ -7,7 +8,7 @@ def is_language_keyword(keyword) :
         'auto', 'break', 'case', 'char', 'const', 'continue', 'default', 'do',
         'double', 'else', 'enum', 'extern', 'float', 'for', 'goto', 'if',
         'int', 'long', 'register', 'return', 'short', 'signed', 'sizeof', 'static',
-        'struct', 'switch', 'typedef', 'union', 'unsigned', 'void', 'volatile', 'while'
+        'struct', 'switch', 'typedef', 'union', 'unsigned', 'void', 'volatile', 'while',"include","stdio.h"
     ]
     return keyword in c_keywords
 
@@ -45,7 +46,7 @@ def is_relational_operator(temp_string:str):
         return False
 
 def is_special_char(char):
-    symbols = [';', ':', ',', '[', ']', '(', ')', '{', '}','#','.','"',"'",'\\']
+    symbols = [';', ':', ',', '[', ']', '(', ')', '{', '}','#','"',"'",'\\']
     
     if char in symbols:
         return True #'special char', char
@@ -85,7 +86,7 @@ def token_Type(temp_string):
     elif (is_language_keyword(temp_string)) : 
         return "keyword" , temp_string
     elif (is_identifier(temp_string)):
-        return "identifier", temp_string
+        return "ID", temp_string
     elif (is_start_of_comment(temp_string)):
         return "start_of_comment", temp_string
     elif (is_characters_constant(temp_string)):
@@ -125,14 +126,16 @@ while file_length >= 0:
     #just see if the entered character is delmiter or not
     if (is_operator(temp_char) or is_special_char(temp_char) or is_whitespace(temp_char)):
         if temp_token!='':
-            output_result.append(str(token_Type(temp_token)))
-        output_result.append(str(token_Type(temp_char)))
+            if(token_Type(temp_token)[0]!="whitespace"):
+                output_result.append(token_Type(temp_token))
+        if(token_Type(temp_char)[0]!="whitespace"):
+            output_result.append(token_Type(temp_char))
         temp_token=""
         continue
 
     elif (is_relational_operator(temp_char)):
         if temp_token!='':
-            output_result.append(str(token_Type(temp_token)))
+            output_result.append(token_Type(temp_token))
         temp_token=temp_char
         temp_char=filename.read(1)
         file_length-=1
@@ -140,19 +143,26 @@ while file_length >= 0:
         
         if(is_relational_operator(temp_token)):
             if temp_token!='':
-                output_result.append(str(token_Type(temp_token)))
+                output_result.append(token_Type(temp_token))
             temp_token=""
             continue
         else:
             if temp_token!='':
-                output_result.append(str(token_Type(temp_token[0])))
+                output_result.append(token_Type(temp_token[0]))
             temp_token=temp_token[1]
             continue
 
     temp_token+=temp_char
 
-with open("output.txt" , "w") as output_file :
-    for line in output_result : 
-        output_file.write(line + "\n")
+
+
+def write_tokens_in_file(file_path,data):
+    print(data,type(data[0]))
+    with open(file_path, 'wb') as file:
+        pickle.dump(data, file)
+
+write_tokens_in_file("../output.pkl",output_result)
+
+
 
 
