@@ -69,7 +69,7 @@ def is_identifier(temp_string:str):
         return False
 
 def is_start_of_comment(temp_string:str):
-    if(temp_string=="//" or temp_string=="/*"):
+    if(temp_string=="//" ):
         return True
     else:
         return False
@@ -87,8 +87,8 @@ def token_Type(temp_string):
         return "keyword" , temp_string
     elif (is_identifier(temp_string)):
         return "ID", temp_string
-    elif (is_start_of_comment(temp_string)):
-        return "start_of_comment", temp_string
+    elif (is_start_of_comment(temp_string[0:2])):
+        return "comment", temp_string[2:]
     elif (is_characters_constant(temp_string)):
         return "characters_constant", temp_string
     elif (is_number(temp_string)):
@@ -120,11 +120,13 @@ file_length = len(open(args.filename,'r').read())
 temp_token = ""
 output_result = []
 
+
+
 while file_length >= 0:
     temp_char = filename.read(1)
     file_length-=1
     #just see if the entered character is delmiter or not
-    if (is_operator(temp_char) or is_special_char(temp_char) or is_whitespace(temp_char)):
+    if ((is_operator(temp_char) and temp_char!='/') or is_special_char(temp_char) or is_whitespace(temp_char)):
         if temp_token!='':
             if(token_Type(temp_token)[0]!="whitespace"):
                 output_result.append(token_Type(temp_token))
@@ -152,16 +154,44 @@ while file_length >= 0:
             temp_token=temp_token[1]
             continue
 
+    elif (is_operator(temp_char)):
+        if temp_token!='':
+            output_result.append(token_Type(temp_token))
+        temp_token=temp_char
+        temp_char=filename.read(1)
+        file_length-=1
+        temp_token+=temp_char
+        
+        if(temp_token=="//"):
+            temp_char=filename.read(1)
+            while(temp_char!='\n'):
+                temp_token+=temp_char
+                temp_char=filename.read(1)
+            output_result.append(token_Type(temp_token))
+            temp_token=""
+            continue
+        else:
+            if temp_token!='':
+                output_result.append(token_Type(temp_token[0]))
+            temp_token=temp_token[1]
+            continue
+
+
     temp_token+=temp_char
 
 
 
 def write_tokens_in_file(file_path,data):
-    print(data,type(data[0]))
-    with open(file_path, 'wb') as file:
+    with open(file_path+".pkl", 'wb') as file:
         pickle.dump(data, file)
+    # Open the file in write mode
+    with open(file_path+".txt", "w") as file:
+    # Iterate through the list of pairs
+        for pair in data:
+        # Convert the pair to a string and write to the file
+            file.write(f"({pair[0]}, {pair[1]})\n")
 
-write_tokens_in_file("../output.pkl",output_result)
+write_tokens_in_file("../output",output_result)
 
 
 
